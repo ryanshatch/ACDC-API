@@ -1,82 +1,129 @@
+#* Version 3.0
+#* Description: This is a simple API that searches for inmates in the Aiken County Sheriff's Office system.
+#* The API accepts a POST request with a JSON payload containing a list of inmates to search for.
+
 from flask import Flask, request, jsonify
 import requests
-import smtplib
-from email.mime.text import MIMEText
-from twilio.rest import Client
 
 app = Flask(__name__)
-
-# Twilio configuration
-TWILIO_ACCOUNT_SID = 'banana'
-TWILIO_AUTH_TOKEN = 'banana'
-TWILIO_PHONE_NUMBER = 'banana'
-
-# Email configuration
-SMTP_SERVER = 'smtp.banana.com'
-SMTP_PORT = 587
-EMAIL_USER = 'banana@banana.banana'
-EMAIL_PASS = 'bananas'
 
 # Aiken County Inmate search URL
 AIKEN_URL = 'https://aikencountysheriff.net/inmate-search'
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate to search.'}), 200
+    return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate to search for inmates.'}), 200
 
 @app.route('/check-inmate', methods=['POST'])
 def check_inmate():
     data = request.json
-    alert_email = data.get('alert_email')
-    alert_phone = data.get('alert_phone')
+    inmates = data.get('inmates', [])
 
-    # Perform a GET request to the Aiken County Inmate search
-    response = requests.post(AIKEN_URL, data={'firstName': 'Foster', 'lastName': 'Fech'})
+    found_inmates = []
 
-    if response.status_code == 200:
-        inmate_found = 'No records found' not in response.text
+    for inmate in inmates:
+        response = requests.post(AIKEN_URL, data=inmate)
 
-        # Send an alert if the inmate is found
-        if inmate_found:
-            message = f'Inmate Foster Fech has been located in the Aiken County system.'
-            if alert_email:
-                send_email_alert(alert_email, message)
-            if alert_phone:
-                send_sms_alert(alert_phone, message)
-            return jsonify({'status': 'Inmate found, alert sent'}), 200
-        else:
-            return jsonify({'status': 'Inmate not found'}), 200
+        if response.status_code == 200:
+            if 'No records found' not in response.text:
+                found_inmates.append(inmate)
+
+    if found_inmates:
+        return jsonify({'status': 'Inmates found', 'found_inmates': found_inmates}), 200
     else:
-        return jsonify({'status': 'Error searching for inmate'}), 500
-
-def send_email_alert(to_email, message):
-    msg = MIMEText(message)
-    msg['Subject'] = 'Inmate Search Alert'
-    msg['From'] = EMAIL_USER
-    msg['To'] = to_email
-
-    try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(EMAIL_USER, EMAIL_PASS)
-            server.sendmail(EMAIL_USER, to_email, msg.as_string())
-    except Exception as e:
-        print(f'Failed to send email: {e}')
-
-def send_sms_alert(to_phone, message):
-    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-    try:
-        client.messages.create(
-            body=message,
-            from_=TWILIO_PHONE_NUMBER,
-            to=to_phone
-        )
-    except Exception as e:
-        print(f'Failed to send SMS: {e}')
+        return jsonify({'status': 'No inmates found'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
+
+#* Version Two using Twilio alerts
+
+# from flask import Flask, request, jsonify
+# import requests
+# import smtplib
+# from email.mime.text import MIMEText
+# from twilio.rest import Client
+
+# app = Flask(__name__)
+
+# # Twilio configuration
+# TWILIO_ACCOUNT_SID = 'your_twilio_account_sid'
+# TWILIO_AUTH_TOKEN = 'your_twilio_auth_token'
+# TWILIO_PHONE_NUMBER = 'your_twilio_phone_number'
+
+# # Email configuration
+# SMTP_SERVER = 'smtp.example.com'
+# SMTP_PORT = 587
+# EMAIL_USER = 'your_email@example.com'
+# EMAIL_PASS = 'your_email_password'
+
+# # Aiken County Inmate search URL
+# AIKEN_URL = 'https://aikencountysheriff.net/inmate-search'
+
+# @app.route('/', methods=['GET'])
+# def home():
+#     return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate to see if Dalton Jones and the babies sperm donor are still locked up.'}), 200
+
+# @app.route('/check-inmate', methods=['POST'])
+# def check_inmate():
+#     data = request.json
+#     alert_email = data.get('alert_email')
+#     alert_phone = data.get('alert_phone')
+
+#     inmates = [
+#         {'firstName': 'Foster', 'lastName': 'Fech'},
+#         {'firstName': 'Dalton', 'lastName': 'Jones'}
+#     ]
+
+#     found_inmates = []
+
+#     for inmate in inmates:
+#         response = requests.post(AIKEN_URL, data=inmate)
+
+#         if response.status_code == 200:
+#             inmate_found = 'No records found' not in response.text
+
+#             if inmate_found:
+#                 found_inmates.append(inmate)
+#                 message = f"Inmate {inmate['firstName']} {inmate['lastName']} has been located in the Aiken County system."
+#                 if alert_email:
+#                     send_email_alert(alert_email, message)
+#                 if alert_phone:
+#                     send_sms_alert(alert_phone, message)
+
+#     if found_inmates:
+#         return jsonify({'status': 'Inmates found., ', 'found_inmates': found_inmates}), 200
+#     else:
+#         return jsonify({'status': 'No inmates found'}), 200
+
+# def send_email_alert(to_email, message):
+#     msg = MIMEText(message)
+#     msg['Subject'] = 'Inmate Search Alert'
+#     msg['From'] = EMAIL_USER
+#     msg['To'] = to_email
+
+#     try:
+#         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+#             server.starttls()
+#             server.login(EMAIL_USER, EMAIL_PASS)
+#             server.sendmail(EMAIL_USER, to_email, msg.as_string())
+#     except Exception as e:
+#         print(f'Failed to send email: {e}')
+
+# def send_sms_alert(to_phone, message):
+#     client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+#     try:
+#         client.messages.create(
+#             body=message,
+#             from_=TWILIO_PHONE_NUMBER,
+#             to=to_phone
+#         )
+#     except Exception as e:
+#         print(f'Failed to send SMS: {e}')
+
+# if __name__ == '__main__':
+#     app.run(debug=True, host='0.0.0.0', port=5000)
 
 # from flask import Flask, request, jsonify
 # import requests
