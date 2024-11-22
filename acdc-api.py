@@ -1,6 +1,8 @@
-#* Version 3.0
+#* Version 4.0
 #* Description: This is a simple API that searches for inmates in the Aiken County Sheriff's Office system.
 #* The API accepts a POST request with a JSON payload containing a list of inmates to search for.
+#  The main reason for this is to check if certain people I know are or are not in jail.
+#  Removed Twilio Alerts.
 
 from flask import Flask, request, jsonify
 import requests
@@ -37,7 +39,7 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
 
-#* Version Two using Twilio alerts
+#* Version Three adding Dalton
 
 # from flask import Flask, request, jsonify
 # import requests
@@ -124,6 +126,9 @@ if __name__ == '__main__':
 
 # if __name__ == '__main__':
 #     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+## VERSION 2.0
 
 # from flask import Flask, request, jsonify
 # import requests
@@ -224,6 +229,7 @@ if __name__ == '__main__':
 # if __name__ == '__main__':
 #     app.run(debug=True, host='0.0.0.0', port=5000)
 
+## VERSION 1.0
 
 # from flask import Flask, request, jsonify
 # import requests
