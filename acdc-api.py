@@ -31,9 +31,9 @@ def check_inmate():
                 found_inmates.append(inmate)
 
     if found_inmates:
-        return jsonify({'status': 'Inmates found', 'found_inmates': found_inmates}), 200
+        return jsonify({'status of the ACDC inmates': 'Found and Still locked up.', 'found_inmates': found_inmates}), 200
     else:
-        return jsonify({'status': 'No inmates found'}), 200
+        return jsonify({'status': 'No inmates found, try again..'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
