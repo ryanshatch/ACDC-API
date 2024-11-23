@@ -10,7 +10,7 @@ import requests
 app = Flask(__name__)
 
 # Aiken County Inmate search URL
-AIKEN_URL = 'https://aikencountysheriff.net/inmate-search'
+AIKEN_URL = 'https://aikencountysheriff.net/inmate-search/'
 
 @app.route('/', methods=['GET'])
 def home():
