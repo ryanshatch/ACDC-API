@@ -1,8 +1,7 @@
-#* Version 4.0
+#* Version 5.0
 #* Description: This is a simple API that searches for inmates in the Aiken County Sheriff's Office system.
 #* The API accepts a POST request with a JSON payload containing a list of inmates to search for.
-#  The main reason for this is to check if certain people I know are or are not in jail.
-#  Removed Twilio Alerts.
+#  The main reason for this is to check if certain people I know are or are not in jail. 
 
 from flask import Flask, request, jsonify
 import requests
@@ -14,32 +13,200 @@ AIKEN_URL = 'https://aikencountysheriff.net/inmate-search/'
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate to search for inmates.'}), 200
+    return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate (POST or GET) to search for inmates.'}), 200
 
 @app.route('/check-inmate', methods=['POST'])
-def check_inmate():
+def check_inmate_post():
+    # Handle POST request with JSON payload
     data = request.json
     inmates = data.get('inmates', [])
 
+    if not inmates:
+        return jsonify({'error': 'No inmates provided. Please include an "inmates" key in your JSON payload.'}), 400
+
+    return process_inmate_search(inmates)
+
+@app.route('/check-inmate', methods=['GET'])
+def check_inmate_get():
+    # Handle GET request with query parameter
+    inmates = request.args.get('inmates')
+
+    if not inmates:
+        return jsonify({'error': 'No inmates provided. Please specify "inmates" as a query parameter.'}), 400
+
+    # Split the comma-separated list of inmates
+    inmate_list = inmates.split(',')
+    return process_inmate_search(inmate_list)
+
+def process_inmate_search(inmate_list):
+    """Process the inmate search for both POST and GET."""
     found_inmates = []
 
-    for inmate in inmates:
-        response = requests.post(AIKEN_URL, data=inmate)
+    for inmate in inmate_list:
+        inmate = inmate.strip()
+        response = requests.post(AIKEN_URL, data={'name': inmate})
+
+        # Debugging log (optional for development)
+        print(f"Checking inmate: {inmate}")
+        print(f"Response status code: {response.status_code}")
+        print(f"Response text: {response.text[:500]}")  # Print the first 500 characters of the response
 
         if response.status_code == 200:
-            if 'No records found' not in response.text:
+            # Adjust this check based on actual HTML content
+            if inmate.lower() in response.text.lower() and 'No records found' not in response.text:
                 found_inmates.append(inmate)
 
     if found_inmates:
-        return jsonify({'status of the ACDC inmates': 'Found and Still locked up.', 'found_inmates': found_inmates}), 200
+        return jsonify({'status of the ACDC inmates': 'Found and still locked up.', 'found_inmates': found_inmates}), 200
     else:
         return jsonify({'status': 'No inmates found, try again..'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
+# from flask import Flask, request, jsonify
+# import requests
 
-#* Version Three adding Dalton
+# app = Flask(__name__)
+
+# # Aiken County Inmate search URL
+# AIKEN_URL = 'https://aikencountysheriff.net/inmate-search/'
+
+# @app.route('/', methods=['GET'])
+# def home():
+#     return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate (POST or GET) to search for inmates.'}), 200
+
+# @app.route('/check-inmate', methods=['POST'])
+# def check_inmate_post():
+#     data = request.json
+#     inmates = data.get('inmates', [])
+
+#     if not inmates:
+#         return jsonify({'error': 'No inmates provided. Please include an "inmates" key in your JSON payload.'}), 400
+
+#     found_inmates = []
+
+#     for inmate in inmates:
+#         response = requests.post(AIKEN_URL, data={'name': inmate.strip()})
+
+#         if response.status_code == 200:
+#             if 'No records found' not in response.text:
+#                 found_inmates.append(inmate.strip())
+
+#     if found_inmates:
+#         return jsonify({'status of the ACDC inmates': 'Found and still locked up.', 'found_inmates': found_inmates}), 200
+#     else:
+#         return jsonify({'status': 'No inmates found, try again..'}), 200
+
+# @app.route('/check-inmate', methods=['GET'])
+# def check_inmate_get():
+#     inmates = request.args.get('inmates')
+
+#     if not inmates:
+#         return jsonify({'error': 'No inmates provided. Please specify "inmates" as a query parameter.'}), 400
+
+#     inmate_list = inmates.split(',')
+#     found_inmates = []
+
+#     for inmate in inmate_list:
+#         response = requests.post(AIKEN_URL, data={'name': inmate.strip()})
+#         print(f"Response for {inmate.strip()}: {response.status_code}")
+#         print(response.text)  # Debugging: Print response content
+
+#         if response.status_code == 200:
+#             # Update this condition based on the website's HTML structure
+#             if inmate.strip().lower() in response.text.lower():
+#                 found_inmates.append(inmate.strip())
+
+#     if found_inmates:
+#         return jsonify({'status of the ACDC inmates': 'Found and still locked up.', 'found_inmates': found_inmates}), 200
+#     else:
+#         return jsonify({'status': 'No inmates found, try again..'}), 200
+
+# if __name__ == '__main__':
+#     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+#* Version 4.0
+#* Description: This is a simple API that searches for inmates in the Aiken County Sheriff's Office system.
+#* The API accepts a POST request with a JSON payload containing a list of inmates to search for.
+#  The main reason for this is to check if certain people I know are or are not in jail.
+#  Removed Twilio Alerts.
+
+# from flask import Flask, request, jsonify
+# import requests
+
+# app = Flask(__name__)
+
+# # Aiken County Inmate search URL
+# AIKEN_URL = 'https://aikencountysheriff.net/inmate-search/'
+
+# @app.route('/', methods=['GET'])
+# def home():
+#     return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate to search for inmates.'}), 200
+
+# @app.route('/check-inmate', methods=['POST'])
+# def check_inmate():
+#     data = request.json
+#     inmates = data.get('inmates', [])
+
+#     found_inmates = []
+
+#     for inmate in inmates:
+#         response = requests.post(AIKEN_URL, data=inmate)
+
+#         if response.status_code == 200:
+#             if 'No records found' not in response.text:
+#                 found_inmates.append(inmate)
+
+#     if found_inmates:
+#         return jsonify({'status of the ACDC inmates': 'Found and Still locked up.', 'found_inmates': found_inmates}), 200
+#     else:
+#         return jsonify({'status': 'No inmates found, try again..'}), 200
+
+# if __name__ == '__main__':
+#     app.run(debug=True, host='0.0.0.0', port=5000)
+
+#* Version 3.0
+#* Description: This is a simple API that searches for inmates in the Aiken County Sheriff's Office system.
+#* The API accepts a POST request with a JSON payload containing a list of inmates to search for.
+
+# from flask import Flask, request, jsonify
+# import requests
+
+# app = Flask(__name__)
+
+# # Aiken County Inmate search URL
+# AIKEN_URL = 'https://aikencountysheriff.net/inmate-search'
+
+# @app.route('/', methods=['GET'])
+# def home():
+#     return jsonify({'message': 'Welcome to the Inmate Search API. Use /check-inmate to search for inmates.'}), 200
+
+# @app.route('/check-inmate', methods=['POST'])
+# def check_inmate():
+#     data = request.json
+#     inmates = data.get('inmates', [])
+
+#     found_inmates = []
+
+#     for inmate in inmates:
+#         response = requests.post(AIKEN_URL, data=inmate)
+
+#         if response.status_code == 200:
+#             if 'No records found' not in response.text:
+#                 found_inmates.append(inmate)
+
+#     if found_inmates:
+#         return jsonify({'status': 'Inmates found', 'found_inmates': found_inmates}), 200
+#     else:
+#         return jsonify({'status': 'No inmates found'}), 200
+
+# if __name__ == '__main__':
+#     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+#* Version Two using Twilio alerts
 
 # from flask import Flask, request, jsonify
 # import requests
@@ -126,9 +293,6 @@ if __name__ == '__main__':
 
 # if __name__ == '__main__':
 #     app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-## VERSION 2.0
 
 # from flask import Flask, request, jsonify
 # import requests
@@ -229,7 +393,6 @@ if __name__ == '__main__':
 # if __name__ == '__main__':
 #     app.run(debug=True, host='0.0.0.0', port=5000)
 
-## VERSION 1.0
 
 # from flask import Flask, request, jsonify
 # import requests
