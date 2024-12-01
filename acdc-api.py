@@ -18,26 +18,31 @@ def home():
 
 @app.route('/check-inmate', methods=['POST'])
 def check_inmate():
-    data = request.json
-    inmates = data.get('inmates', [])
+    try:
+        data = request.get_json(force=True)
+        print(f"Received data: {data}")  # Debug print to verify received data
+        if not data:
+            return jsonify({'error': 'Invalid JSON payload'}), 400
 
-    found_inmates = []
+        inmates = data.get('inmates', [])
+        if not isinstance(inmates, list):
+            return jsonify({'error': 'Invalid format for inmates'}), 400
 
-    for inmate in inmates:
-        response = requests.post(AIKEN_URL, data=inmate)
+        found_inmates = []
 
-        if response.status_code == 200:
-            if 'No records found' not in response.text:
-                found_inmates.append(inmate)
+        for inmate in inmates:
+            response = requests.post(AIKEN_URL, data=inmate)
+            if response.status_code == 200:
+                if 'No records found' not in response.text:
+                    found_inmates.append(inmate)
 
-    if found_inmates:
-        return jsonify({'status of the ACDC inmates': 'Found and Still locked up.', 'found_inmates': found_inmates}), 200
-    else:
-        return jsonify({'status': 'No inmates found, try again..'}), 200
+        return jsonify({'found_inmates': found_inmates}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
+    app.run(debug=True)
 
 #* Version Three adding Dalton
 
