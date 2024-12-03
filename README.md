@@ -1,2 +1,2 @@
-<code>C:\Users\rshat>curl -X POST https://acdc-api.onrender.com/check-inmate -H "Content-Type: application/json" -d "{\"inmates\":[{\"firstName\":\"Foster\",\"lastName\":\"Fech\"}]}"
-{"found_inmates":[{"firstName":"Foster","lastName":"Fech"}]}</code>
+<code>curl --location --max-time 90 --request POST "https://acdc-api.onrender.com/check-inmate" --header "Content-Type: application/json" --data "{\"inmates\":[{\"firstName\":\"Foster\",\"lastName\":\"Fech\"}]}"
+</code>
