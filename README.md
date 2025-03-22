@@ -8,7 +8,7 @@
 	-H "Content-Type: application/json" \
 	-d "{
   \"inmates\": [
-    { \"firstName\": \"Foster\", \"lastName\": \"Fech\" }
+    { \"firstName\": \"Jack\", \"lastName\": \"Jackson\" }
   ]
 }" \
 	"https://acdc-api.onrender.com/check-inmate"</code>
