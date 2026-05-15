@@ -208,7 +208,7 @@ It includes:
 
 ## License
 
-See the `LICENSE` file for details.
+See the [License](https://github.com/ryanshatch/ACDC-API/tree/main?tab=License-1-ov-file) file for details.
 
 <!-- <code>curl --location --max-time 90 --request POST "https://acdc-api.onrender.com/check-inmate" --header "Content-Type: application/json" --data "{\"inmates\":[{\"firstName\":\"Jack\",\"lastName\":\"Jackson\"}]}"
 </code>
