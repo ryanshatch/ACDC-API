@@ -1,214 +1,211 @@
-# ACDC-API
+<h1>ACDC-API</h1>
 
-A small Flask API that checks whether specified individuals appear in the Aiken County Sheriff’s Office inmate search system. Clients send a list of inmates (first/last names) to the API, which submits each entry to the county search endpoint and returns the subset that appear to be found.
+<p>A small Flask API that checks whether specified individuals appear in the Aiken County Sheriff’s Office inmate search system. Clients send a list of inmates (first/last names) to the API, which submits each entry to the county search endpoint and returns the subset that appear to be found.</p>
 
-> **Note**: This project performs automated lookups against the Aiken County Sheriff’s Office inmate search page. Ensure your usage complies with the site’s terms of service and applicable laws.
+<blockquote>
+  <p><strong>Note</strong>: This project performs automated lookups against the Aiken County Sheriff’s Office inmate search page. Ensure your usage complies with the site’s terms of service and applicable laws.</p>
+</blockquote>
 
----
+<hr>
 
-## Table of Contents
+<h2>Table of Contents</h2>
 
-- [Features](#features)
-- [How It Works](#how-it-works)
-- [API Endpoints](#api-endpoints)
-- [Request & Response Examples](#request--response-examples)
-- [Running Locally](#running-locally)
-- [Deployment](#deployment)
-- [Postman Collection](#postman-collection)
-- [Project Structure](#project-structure)
-- [Dependencies](#dependencies)
-- [Notes & Limitations](#notes--limitations)
-- [License](#license)
+<ul>
+  <li><a href="#features">Features</a></li>
+  <li><a href="#how-it-works">How It Works</a></li>
+  <li><a href="#api-endpoints">API Endpoints</a></li>
+  <li><a href="#request--response-examples">Request &amp; Response Examples</a></li>
+  <li><a href="#running-locally">Running Locally</a></li>
+  <li><a href="#deployment">Deployment</a></li>
+  <li><a href="#postman-collection">Postman Collection</a></li>
+  <li><a href="#project-structure">Project Structure</a></li>
+  <li><a href="#dependencies">Dependencies</a></li>
+  <li><a href="#notes--limitations">Notes &amp; Limitations</a></li>
+  <li><a href="#license">License</a></li>
+</ul>
 
----
+<hr>
 
-## Features
+<h2 id="features">Features</h2>
 
-- **Simple JSON API** for inmate lookup by first and last name.
-- **Batch input**: submit multiple inmates in a single request.
-- **Minimal dependencies**: Flask + requests.
-- **Postman collection** included for quick testing.
-- **Sample responses** stored in the `Responses/` folder.
+<ul>
+  <li><strong>Simple JSON API</strong> for inmate lookup by first and last name.</li>
+  <li><strong>Batch input</strong>: submit multiple inmates in a single request.</li>
+  <li><strong>Minimal dependencies</strong>: Flask + requests.</li>
+  <li><strong>Postman collection</strong> included for quick testing.</li>
+  <li><strong>Sample responses</strong> stored in the <code>Responses/</code> folder.</li>
+</ul>
 
----
+<hr>
 
-## How It Works
+<h2 id="how-it-works">How It Works</h2>
 
-The `/check-inmate` endpoint accepts a JSON payload like:
+<p>The <code>/check-inmate</code> endpoint accepts a JSON payload like:</p>
 
-```json
-{
+<pre><code class="language-json">{
   "inmates": [
     { "firstName": "Jack", "lastName": "Jackson" }
   ]
-}
-```
+}</code></pre>
 
-For each inmate object, the API posts the data to the Aiken County Sheriff’s Office inmate search page. If the response does **not** contain `"No records found"`, that inmate is considered a match and included in the response.
+<p>For each inmate object, the API posts the data to the Aiken County Sheriff’s Office inmate search page. If the response does <strong>not</strong> contain <code>"No records found"</code>, that inmate is considered a match and included in the response.</p>
 
----
+<hr>
 
-## API Endpoints
+<h2 id="api-endpoints">API Endpoints</h2>
 
-### `GET /`
-**Description:** Health/welcome endpoint.
+<h3><code>GET /</code></h3>
 
-**Response:**
-```json
-{
+<p><strong>Description:</strong> Health/welcome endpoint.</p>
+
+<p><strong>Response:</strong></p>
+
+<pre><code class="language-json">{
   "message": "Welcome to the Inmate Search API. Use /check-inmate to search for inmates."
-}
-```
+}</code></pre>
 
----
+<hr>
 
-### `POST /check-inmate`
-**Description:** Submit a list of inmates to check.
+<h3><code>POST /check-inmate</code></h3>
 
-**Request Body:**
-```json
-{
+<p><strong>Description:</strong> Submit a list of inmates to check.</p>
+
+<p><strong>Request Body:</strong></p>
+
+<pre><code class="language-json">{
   "inmates": [
     { "firstName": "Kevin", "lastName": "McNasty" },
     { "firstName": "Adam", "lastName": "Jones" }
   ]
-}
-```
+}</code></pre>
 
-**Response (example):**
-```json
-{
+<p><strong>Response (example):</strong></p>
+
+<pre><code class="language-json">{
   "found_inmates": [
     { "firstName": "Kevin", "lastName": "McNasty" },
     { "firstName": "Adam", "lastName": "Jones" }
   ],
   "status": "Inmates found"
-}
-```
+}</code></pre>
 
----
+<hr>
 
-## Request & Response Examples
+<h2 id="request--response-examples">Request &amp; Response Examples</h2>
 
-### cURL
-```bash
-curl --location --max-time 90 \
+<h3>cURL</h3>
+
+<pre><code class="language-bash">curl --location --max-time 90 \
   --request POST "https://acdc-api.onrender.com/check-inmate" \
   --header "Content-Type: application/json" \
   --data "{
     \"inmates\": [
       { \"firstName\": \"Jack\", \"lastName\": \"Jackson\" }
     ]
-  }"
-```
+  }"</code></pre>
 
-### Sample Responses (from `Responses/`)
-Two example response formats exist in the repo:
+<h3>Sample Responses (from <code>Responses/</code>)</h3>
 
-```json
-{
+<p>Two example response formats exist in the repo:</p>
+
+<pre><code class="language-json">{
   "found_inmates": [
     { "firstName": "Kevin", "lastName": "McNasty" },
     { "firstName": "Adam", "lastName": "Jones" }
   ],
   "status": "Inmates found"
-}
-```
+}</code></pre>
 
-```json
-{
+<pre><code class="language-json">{
   "found_inmates": [
     { "firstName": "Kevin", "lastName": "McNasty" },
     { "firstName": "Adam", "lastName": "Jones" }
   ],
   "status": "Inmates found., "
-}
-```
+}</code></pre>
 
----
+<hr>
 
-## Running Locally
+<h2 id="running-locally">Running Locally</h2>
 
-### 1) Install dependencies
-```bash
-pip install -r requirements.txt
-```
+<h3>1) Install dependencies</h3>
 
-### 2) Start the API
-```bash
-python acdc-api.py
-```
+<pre><code class="language-bash">pip install -r requirements.txt</code></pre>
 
-By default Flask runs at: `http://127.0.0.1:5000`
+<h3>2) Start the API</h3>
 
-### 3) Test locally
-```bash
-curl -X POST http://127.0.0.1:5000/check-inmate \
+<pre><code class="language-bash">python acdc-api.py</code></pre>
+
+<p>By default Flask runs at: <code>http://127.0.0.1:5000</code></p>
+
+<h3>3) Test locally</h3>
+
+<pre><code class="language-bash">curl -X POST http://127.0.0.1:5000/check-inmate \
   -H "Content-Type: application/json" \
-  -d '{"inmates":[{"firstName":"Kevin","lastName":"McNasty"}]}'
-```
+  -d '{"inmates":[{"firstName":"Kevin","lastName":"McNasty"}]}'</code></pre>
 
----
+<hr>
 
-## Deployment
+<h2 id="deployment">Deployment</h2>
 
-The repository includes `gunicorn` in `requirements.txt`, so you can deploy using a WSGI server:
+<p>The repository includes <code>gunicorn</code> in <code>requirements.txt</code>, so you can deploy using a WSGI server:</p>
 
-```bash
-gunicorn acdc-api:app
-```
+<pre><code class="language-bash">gunicorn acdc-api:app</code></pre>
 
-Example hosting platforms: Render, Railway, Heroku, or any VPS with Python.
+<p>Example hosting platforms: Render, Railway, Heroku, or any VPS with Python.</p>
 
----
+<hr>
 
-## Postman Collection
+<h2 id="postman-collection">Postman Collection</h2>
 
-A Postman collection is available at:
+<p>A Postman collection is available at:</p>
 
-```
-Postman API/ACDC API Request.postman.json
-```
+<pre><code>Postman API/ACDC API Request.postman.json</code></pre>
 
-It includes:
-- Pre-request script to build the JSON body
-- Tests that validate HTTP status and response structure
-- A visualizer for displaying results in a table
+<p>It includes:</p>
 
----
+<ul>
+  <li>Pre-request script to build the JSON body</li>
+  <li>Tests that validate HTTP status and response structure</li>
+  <li>A visualizer for displaying results in a table</li>
+</ul>
 
-## Project Structure
+<hr>
 
-```
-.
+<h2 id="project-structure">Project Structure</h2>
+
+<pre><code>.
 ├── acdc-api.py                 # Flask app / API logic
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # Project documentation
 ├── Responses/                  # Sample JSON responses
-└── Postman API/                # Postman collection + scripts
-```
+└── Postman API/                # Postman collection + scripts</code></pre>
 
----
+<hr>
 
-## Dependencies
+<h2 id="dependencies">Dependencies</h2>
 
-- **Flask** – web framework
-- **requests** – HTTP client
-- **gunicorn** – production WSGI server
+<ul>
+  <li><strong>Flask</strong> – web framework</li>
+  <li><strong>requests</strong> – HTTP client</li>
+  <li><strong>gunicorn</strong> – production WSGI server</li>
+</ul>
 
----
+<hr>
 
-## Notes & Limitations
+<h2 id="notes--limitations">Notes &amp; Limitations</h2>
 
-- This API depends on the **HTML responses** of the Aiken County Sheriff’s Office inmate search site. If the site changes its structure or response messages, this API may stop working or give incorrect results.
-- The logic currently checks for `"No records found"` in the response HTML. If that phrase changes, results may be inaccurate.
-- For large input lists, each inmate is checked sequentially (no parallelization).
+<ul>
+  <li>This API depends on the <strong>HTML responses</strong> of the Aiken County Sheriff’s Office inmate search site. If the site changes its structure or response messages, this API may stop working or give incorrect results.</li>
+  <li>The logic currently checks for <code>"No records found"</code> in the response HTML. If that phrase changes, results may be inaccurate.</li>
+  <li>For large input lists, each inmate is checked sequentially (no parallelization).</li>
+</ul>
 
----
+<hr>
 
-## License
+<h2 id="license">License</h2>
 
-See the [License](https://github.com/ryanshatch/ACDC-API/tree/main?tab=License-1-ov-file) file for details.
+<p>See the <a href="https://github.com/ryanshatch/ACDC-API/tree/main?tab=License-1-ov-file">License</a> file for details.</p>
 
 <!-- <code>curl --location --max-time 90 --request POST "https://acdc-api.onrender.com/check-inmate" --header "Content-Type: application/json" --data "{\"inmates\":[{\"firstName\":\"Jack\",\"lastName\":\"Jackson\"}]}"
 </code>
